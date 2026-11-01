@@ -6,7 +6,7 @@ from app.schemas.message import MessageCreate
 
 router = APIRouter(prefix="/message" , tags=["Message"])
 
-@router.post("/")
+@router.post("")
 def send_msg (msg : MessageCreate):
     msg_id = message_service.send_text(msg.ciphertext)
     return {"id" : msg_id}
