@@ -1,13 +1,15 @@
 from pydantic_settings import BaseSettings
 
-class Setting(BaseSettings):
-	REDIS_HOST : str = "localhost"
-	REDIS_PORT : int = 6379
-	REDIS_PASSWORD : str = ""
-	APP_ENV : str = "development"
+class Settings(BaseSettings):
+	redis_host : str = "localhost"
+	redis_port : int = 6379
+	redis_password : str = ""
+	app_env : str = "development"
+	msg_ttl_seconds : int = 3600
+	max_msg_length : int = 20000
 
 	class Config :
 		env_file = ".env"
 
-setting = Setting()
+settings = Settings()
 
