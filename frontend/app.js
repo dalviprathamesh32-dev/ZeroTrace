@@ -1,3 +1,5 @@
+const API_BASE = location.port === "5500" ? "http://localhost:8000" : "";
+
 "use strict";
 
 /* ---------- helpers: bytes <-> base64url ---------- */
@@ -77,7 +79,7 @@ function initCreate() {
         return showError("Message is too long after encryption. Shorten it a little.");
       }
 
-      const res = await fetch("/message", {
+      const res = await fetch(API_BASE + "/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ciphertext }),
@@ -121,7 +123,7 @@ function initView() {
     clearError();
     btn.disabled = true;
     try {
-      const res = await fetch("/message/" + encodeURIComponent(id));
+      const res = await fetch(API_BASE +"/message/" + encodeURIComponent(id));
       if (res.status === 404) {
         $("gate").hidden = true;
         return showError("This message doesn't exist, has expired, or was already opened.");
