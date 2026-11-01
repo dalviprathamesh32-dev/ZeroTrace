@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Vault: you have a message</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body data-page="view">
+  <main>
+    <h1>You have a message</h1>
+
+    <section id="gate">
+      <p class="lead">Opening it destroys it. Once you reveal the message, the link stops working.</p>
+      <button id="reveal-btn" type="button">Reveal message</button>
+    </section>
+
+    <section id="output" hidden>
+      <label>Message</label>
+      <pre id="message-text"></pre>
+      <p class="hint">This message is now deleted from the server. Copy it if you need it.</p>
+    </section>
+
+    <p id="error" class="error" role="alert" hidden></p>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
+
+

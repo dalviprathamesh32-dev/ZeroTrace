@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vault: send a message that disappears</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body data-page="create">
+  <main>
+    <h1>Send a message that disappears</h1>
+    <p class="lead">Your message is encrypted in this browser. The server only ever stores scrambled text, and the key stays in the link.</p>
+
+    <section id="create-form">
+      <label for="plaintext">Message</label>
+      <textarea id="plaintext" rows="7" maxlength="10000" placeholder="Type something private"></textarea>
+      <div class="row">
+        <span id="count" class="hint">0 / 10000</span>
+        <button id="encrypt-btn" type="button">Create secure link</button>
+      </div>
+      <p id="error" class="error" role="alert" hidden></p>
+    </section>
+
+    <section id="result" hidden>
+      <label for="link">Your link (works once, expires in 1 hour)</label>
+      <input id="link" type="text" readonly>
+      <button id="copy-btn" type="button">Copy link</button>
+      <p class="hint">Share the whole link, including the part after #. Anyone with it can read the message once.</p>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
+
