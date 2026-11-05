@@ -4,6 +4,6 @@ from app.core.config import settings
 
 
 class MessageCreate (BaseModel):
-    Data : str = Field(min_length=1 , max_length=settings.max_msg_length)
+    ciphertext : str = Field(min_length=1 , max_length=settings.max_msg_length)
     expiry_time : int = settings.msg_ttl_seconds
 

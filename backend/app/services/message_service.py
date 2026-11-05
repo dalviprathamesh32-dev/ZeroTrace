@@ -8,9 +8,9 @@ from app.core.config import settings
 def _key (msg_id : str) -> str:
     return f"msg:{msg_id}"
 
-def send_text (Data : str , expiry_time : int) -> str:
+def send_text (ciphertext : str , expiry_time : int) -> str:
     msg_id = secrets.token_urlsafe(16)
-    redis_client.set(_key(msg_id), Data , ex=expiry_time)
+    redis_client.set(_key(msg_id), ciphertext , ex=expiry_time)
     return msg_id
 
 def get_text (msg_id : str) -> str | None :

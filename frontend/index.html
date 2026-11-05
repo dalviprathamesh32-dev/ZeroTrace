@@ -14,6 +14,14 @@
     <section id="create-form">
       <label for="plaintext">Message</label>
       <textarea id="plaintext" rows="7" maxlength="10000" placeholder="Type something private"></textarea>
+
+      <label for="expiry">Expires in</label>
+      <select id="expiry">
+        <option value="300">5 minutes</option>
+        <option value="3600" selected>1 hour</option>
+        <option value="86400">24 hours</option>
+      </select>
+
       <div class="row">
         <span id="count" class="hint">0 / 10000</span>
         <button id="encrypt-btn" type="button">Create secure link</button>

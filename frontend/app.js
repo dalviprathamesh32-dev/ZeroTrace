@@ -19,18 +19,13 @@ function fromB64url(str) {
 const MAX_CIPHERTEXT_LEN = 20000; // keep in sync with backend max_ciphertext_length
 
 async function encryptText(plaintext) {
-  // 1. fresh random 256-bit key for every message
   const key = await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt"]);
-  // 2. fresh random 12-byte IV; never reuse an IV with the same key
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  // 3. encrypt (GCM also adds an authentication tag, so tampering is detected)
   const data = new TextEncoder().encode(plaintext);
   const encrypted = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, data));
-  // 4. payload = iv + ciphertext, so the receiver can split them again
   const payload = new Uint8Array(iv.length + encrypted.length);
   payload.set(iv, 0);
   payload.set(encrypted, iv.length);
-  // 5. export the raw key so it can go in the URL #fragment
   const rawKey = new Uint8Array(await crypto.subtle.exportKey("raw", key));
   return { ciphertext: toB64url(payload), key: toB64url(rawKey) };
 }
@@ -41,7 +36,7 @@ async function decryptText(ciphertextB64, keyB64) {
   const payload = fromB64url(ciphertextB64);
   const iv = payload.slice(0, 12);
   const body = payload.slice(12);
-  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, body); // throws if key is wrong or data was changed
+  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, body);
   return new TextDecoder().decode(plain);
 }
 
@@ -56,6 +51,12 @@ function showError(msg) {
 
 function clearError() {
   $("error").hidden = true;
+}
+
+/* ---------- expiry label helper ---------- */
+function expiryLabel(seconds) {
+  const map = { 300: "5 minutes", 3600: "1 hour", 86400: "24 hours" };
+  return map[seconds] || (seconds + " seconds");
 }
 
 /* ---------- create page ---------- */
@@ -79,16 +80,19 @@ function initCreate() {
         return showError("Message is too long after encryption. Shorten it a little.");
       }
 
+      const expirySeconds = parseInt($("expiry").value, 10);
+
       const res = await fetch(API_BASE + "/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ciphertext }),
+        body: JSON.stringify({ ciphertext, expiry_time: expirySeconds }),
       });
       if (!res.ok) return showError("Server rejected the message (status " + res.status + ").");
 
       const { id } = await res.json();
-      // the key goes after '#', so the browser never sends it to the server
       $("link").value = location.origin + "/view.html?id=" + encodeURIComponent(id) + "#" + key;
+      document.querySelector('label[for="link"]').textContent =
+        "Your link (works once, expires in " + expiryLabel(expirySeconds) + ")";
       $("result").hidden = false;
       textarea.value = "";
       $("count").textContent = "0 / 10000";
@@ -117,13 +121,11 @@ function initView() {
     return showError("This link is incomplete. Ask the sender for the full link, including the part after #.");
   }
 
-  // Nothing is fetched on page load. Link-preview bots open the page but never click,
-  // so they can't use up the message.
   btn.addEventListener("click", async () => {
     clearError();
     btn.disabled = true;
     try {
-      const res = await fetch(API_BASE +"/message/" + encodeURIComponent(id));
+      const res = await fetch(API_BASE + "/message/" + encodeURIComponent(id));
       if (res.status === 404) {
         $("gate").hidden = true;
         return showError("This message doesn't exist, has expired, or was already opened.");
@@ -139,10 +141,10 @@ function initView() {
         return showError("Could not decrypt. The key in the link is wrong or damaged. The message is already deleted.");
       }
 
-      $("message-text").textContent = text; // textContent, never innerHTML (prevents XSS)
+      $("message-text").textContent = text;
       $("gate").hidden = true;
       $("output").hidden = false;
-      history.replaceState(null, "", location.pathname); // remove the key from the address bar
+      history.replaceState(null, "", location.pathname);
     } catch (err) {
       showError("Network error. Check your connection and try again.");
     } finally {
@@ -154,5 +156,4 @@ function initView() {
 const page = document.body.dataset.page;
 if (page === "create") initCreate();
 if (page === "view") initView();
-
 
