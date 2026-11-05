@@ -8,7 +8,7 @@ router = APIRouter(prefix="/message" , tags=["Message"])
 
 @router.post("")
 def send_msg (msg : MessageCreate):
-    msg_id = message_service.send_text(msg.ciphertext)
+    msg_id = message_service.send_text(msg.ciphertext , msg.expiry_time)
     return {"id" : msg_id}
 
 @router.get("/{msg_id}")
