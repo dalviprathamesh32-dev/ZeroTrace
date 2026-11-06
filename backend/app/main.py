@@ -9,7 +9,14 @@ from app.routes import message
 from app.core.rate_limiter import rate_limiter
 from app.core.CSP import set_CSP
 
-app = FastAPI()
+from app.core.config import settings
+
+is_prod = settings.app_env == "production"
+app = FastAPI(
+    docs_url=None if is_prod else "/docs",
+    redoc_url=None,
+    openapi_url=None if is_prod else "/openapi.json",
+)
 
 # cors config
 setup_cors(app)

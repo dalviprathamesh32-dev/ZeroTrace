@@ -1,4 +1,6 @@
 import pytest
+from app.core.config import settings
+from fastapi.testclient import TestClient
 
 
 def _create(client, text="hello"):
@@ -74,9 +76,14 @@ def test_evil_origin_not_allowed(client):
     assert allowed not in ("*", "https://evil.example")
 
 
-@pytest.mark.xfail(reason="production mein /docs band karna baaki hai", strict=False)
-def test_docs_hidden(client):
-    assert client.get("/docs").status_code == 404
-    assert client.get("/openapi.json").status_code == 404
+def test_docs_hidden_in_production(monkeypatch):
+    monkeypatch.setattr(settings, "app_env", "production")
+    from importlib import reload
+    import app.main as m
+    reload(m)
+    c = TestClient(m.app)
+    assert c.get("/docs").status_code == 404
+
+
 
 
