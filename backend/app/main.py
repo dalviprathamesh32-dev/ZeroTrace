@@ -6,9 +6,22 @@ from fastapi.staticfiles import StaticFiles
 from app.core.cors import setup_cors
 from app.routes import message
 
+from app.core.rate_limiter import rate_limiter
+from app.core.CSP import set_CSP
+
 app = FastAPI()
+
+# cors config
 setup_cors(app)
+
+# routes config -- message
 app.include_router(message.router)
+
+# rate-limiter config
+rate_limiter(app)
+
+# Adding Content security policy
+set_CSP(app)
 
 
 @app.get("/health")

@@ -8,6 +8,7 @@ class Settings(BaseSettings):
 	msg_ttl_seconds : int = 3600
 	max_msg_length : int = 20000
 	cors_origins : list[str] = []
+	rate_limiter_redis_url : str
 
 	class Config :
 		env_file = ".env"
